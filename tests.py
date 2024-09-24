@@ -1,6 +1,6 @@
 import json
 
-with open('/home/calberto/Documents/Uni/5toCuatri/SistemasInteligentes/Practicas/P1/pr1_SSII/problems/small/avenida_de_espana_250_0.json', 'r') as file:
+with open('./recursos/problems/small/avenida_de_espana_250_0.json', 'r') as file:
     new_dictionary = json.load(file)
 
 print (new_dictionary)
