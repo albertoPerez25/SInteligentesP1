@@ -1,5 +1,6 @@
 import json
 
+#Abrimos el archivo json y lo guardamos en una variable
 with open('./recursos/problems/small/avenida_de_espana_250_0.json', 'r') as file:
     new_dictionary = json.load(file)
 
@@ -17,12 +18,13 @@ print (new_dictionary["segments"])
 intersections = new_dictionary["intersections"]
 segments = new_dictionary["segments"]
 
+#Hacemos un objeto
 class Estado:
     def __init__(self,id,latitud,longitud):
         self.id = id
         self.latitud = latitud
         self.longitud = longitud
-
+#Inicializamos el objeto
 estado = Estado(3,4,5)
 print(estado.id)
 print(estado.latitud)
