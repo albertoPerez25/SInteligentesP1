@@ -19,23 +19,25 @@ intersections = new_dictionary["intersections"]
 segments = new_dictionary["segments"]
 
 #Hacemos un objeto
-class Estado: #En que interseccion estas
-    def __init__(self, id, id_interseccion):
+class Estado: #En que interseccion estas son sus segmentos
+    def __init__(self, id, interseccion):
         self.id = id
-        self.id_interseccion = id_interseccion
+        self.interseccion = interseccion
 
     def __str__(self):
-        return f"State(id={self.id}, intersection_id={self.id_interseccion})"
+        return f"State(id={self.id}, intersection_id={self.interseccion})"
 
     def __repr__(self):
         return self.__str__()
 
     def get_interseccion(self):
-        return self.id_interseccion
+        return self.interseccion
 
     def update_interseccion(self, new_interseccion_id):
-        self.id_interseccion = new_interseccion_id
-class Accion: #lo que puedes hacer en una interseccion
+        self.interseccion = new_interseccion_id
+class Accion: #Irnos por un segmento (calle) u otra. Al elegir un segmento
+    # actualizar Estado con el del campo "final" del segmento escogido
+
     def __init__(self, interseccion, calleElegida):
         self.Nodo = interseccion
         self.calleElegida = calleElegida
@@ -48,12 +50,16 @@ class Accion: #lo que puedes hacer en una interseccion
     def irCalle(self):
         return self.interseccion.get_neighbors()[0]
     
-class Nodo: #representa una interseccion
-    def __init__(self, id, latitude, longitude):
+class Nodo: #representa (creo que todas) las intersecciones y sus segmentos asociados. 
+    #Los segmentos se relacionan entre si y con las intersecciones 
+    # mediante origin y destination, que contienen ids de intersecciones
+    def __init__(self, id, latitude, longitude,speed, index = 0):
         self.id = id 
         self.latitude = latitude
         self.longitude = longitude
+        self.speed = speed
         self.neighbors = []
+        self.index = index
 
     def __str__(self):
         return f"Node(id={self.id}, latitude={self.latitude}, longitude={self.longitude})"
@@ -61,14 +67,26 @@ class Nodo: #representa una interseccion
     def __repr__(self):
         return self.__str__()
 
+    def add_neighbor(self, neighbor):
+        self.neighbors.append(neighbor)
+
     def remove_neighbor(self, neighbor):
         if neighbor in self.neighbors:
             self.neighbors.remove(neighbor)
             return True
         return False
-
+    
+    def next_neighbor(self):
+        if self.index < len(self.neighbors):
+            self.index=self.index+1
+            return True
+        return False
+    
     def get_neighbors(self):
         return self.neighbors
+    
+    def get_currentNeighbor(self):
+        return self.neighbors[self.index]
 
     def get_coordinates(self):
         return (self.latitude, self.longitude)
