@@ -20,7 +20,11 @@ print("------------------------")
 #segments = new_dictionary["segments"]
 
 # Load JSON data
-with open('/home/calberto/Documents/Uni/5toCuatri/SistemasInteligentes/Practicas/P1/pr1_SSII/problems/small/paseo_simon_abril_250_0.json', 'r') as file:
+#with open('/home/calberto/Documents/Uni/5toCuatri/SistemasInteligentes/Practicas/P1/pr1_SSII/problems/small/paseo_simon_abril_250_0.json', 'r') as file:
+ #   data = json.load(file)
+#with open('/home/calberto/Documents/Uni/5toCuatri/SistemasInteligentes/Practicas/P1/pr1_SSII/Proyecto/recursos/problems/medium/calle_maria_marin_500_0.json', 'r') as file:
+#    data = json.load(file)
+with open('/home/calberto/Documents/Uni/5toCuatri/SistemasInteligentes/Practicas/P1/pr1_SSII/Proyecto/recursos/problems/test/test.json', 'r') as file:
     data = json.load(file)
 
 class Intersection:
@@ -198,9 +202,11 @@ class Estado:
 
 
 problema = {
-    "inicial":621983933,
-    "final":1322977378
+    "inicial":data["initial"],
+    "final":data["final"]
 }
+#print(problema["inicial"])
+#print(problema["final"])
 nodoaux = NodoAux(intersection_dic,segments)
 estadoAux = EstadoAux(nodoaux.getIntersection(problema["inicial"]))
 solucion = nodoaux.getIntersection(problema['final'])
