@@ -1,6 +1,7 @@
 import json
+RUTAJSON = '/home/calberto/Documents/Uni/5toCuatri/SistemasInteligentes/Practicas/P1/pr1_SSII/Proyecto/recursos/problems/test/test.json'
 
-with open('/home/calberto/Documents/Uni/5toCuatri/SistemasInteligentes/Practicas/P1/pr1_SSII/Proyecto/recursos/problems/test/test.json', 'r') as file:
+with open(RUTAJSON, 'r') as file:
     data = json.load(file)
 
 #Creamos clases para tener objetos que contengan las intersecciones y segmentos del JSON
