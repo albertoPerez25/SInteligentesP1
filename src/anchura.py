@@ -1,0 +1,87 @@
+from cargadorjson import nodoaux,problema
+
+class Nodo:
+    def __init__(self, interseccion, padre = None, accion = None, coste = 0, profundidad = 0):
+        self.estado = interseccion
+        self.padre = padre
+        self.accion = accion
+        self.coste = coste
+        self.profundidad = profundidad
+
+        #Lista de calles de la interseccion
+        self.calles = nodoaux.getSegmentsOf(nodoaux.getIntersectionId(self.estado))
+        self.it = 0 #Iterador para self.calles
+        
+    def __str__(self):
+        return f"Nodo(estado={self.estado}, padre={self.padre}, accion={self.accion}, coste={self.coste}, profundidad={self.profundidad})"
+
+    #Devuelve la siguiente calle de la interseccion
+    def getNextSegment(self,segments = []):
+        if (len(segments) == 0):
+            segments = self.calles
+        if (self.it >= len(segments)):
+            return None
+        segment = segments[self.it]
+        self.it = self.it + 1
+        return segment
+
+class Estado:
+    def __init__(self,problema):
+        self.nodo = problema
+
+def Sucesor(problema, estado):
+    ret = set()
+    while True:
+        accion = estado.getNextSegment() #es uno de los segmentos de la interseccion en el nodo estado
+        if (accion == None):
+            return ret
+        sucesor = nodoaux.getDestinationOf(accion) #es la interseccion destino de accion
+        tupla = (accion, sucesor)
+        ret.add(tupla)
+
+def testObjetivo(nodo,problema):
+    return nodoaux.getIntersectionId(nodo.estado) == problema["final"]
+
+def costeIndividual(origen,calle,destino):
+    return nodoaux.getDistanceOf(calle) / nodoaux.getSpeedOf(calle)
+
+def listaSolucion(nodo):
+    sol = []
+    aux = nodo
+    while (aux.padre):
+        sol.append(aux.estado)
+        aux = aux.padre
+    sol.append(aux.estado)
+    return sol
+
+frontera = []
+
+def expandir(nodo,problema):
+    sucesores = []
+    for (accion,resultado) in Sucesor(problema,nodo):
+        s = Nodo(resultado, nodo, accion)
+        s.coste = nodo.coste + costeIndividual(nodo,accion,s)
+        s.profundidad = nodo.profundidad + 1
+        sucesores.append(s)
+    return sucesores
+
+def busquedaArbol(problema,frontera):
+    estado = Estado(nodoaux.getIntersection(problema["inicial"]))
+    nodo = Nodo(estado.nodo)
+    frontera.append(nodo)
+    while(True):
+        nodo = frontera[0]
+        if (len(frontera) == 0):
+            return Exception
+        frontera.remove(nodo)
+        if (testObjetivo(nodo,problema)):
+            return listaSolucion(nodo)
+        nose = expandir(nodo,problema)
+        frontera.extend(nose)
+
+fin = busquedaArbol(problema,[])
+print(f"\nAlgoritmo de búsqueda de árbol en anchura")
+print(f"Inicio: {problema["inicial"]} \nFinal: {problema["final"]}\n")
+for i in fin:
+    print(i)
+print(f"\nFIN DEL ALGORITMO")
