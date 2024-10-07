@@ -55,14 +55,16 @@ def listaSolucion(nodo):
     return sol
 
 frontera = []
+visitados = set() #para no volver a expandir nodos ya visitados
 
 def expandir(nodo,problema):
     sucesores = []
     for (accion,resultado) in Sucesor(problema,nodo):
-        s = Nodo(resultado, nodo, accion)
-        s.coste = nodo.coste + costeIndividual(nodo,accion,s)
-        s.profundidad = nodo.profundidad + 1
-        sucesores.append(s)
+        if (not (nodoaux.getIntersectionId(resultado) in visitados)):
+            s = Nodo(resultado, nodo, accion)
+            s.coste = nodo.coste + costeIndividual(nodo,accion,s)
+            s.profundidad = nodo.profundidad + 1
+            sucesores.append(s)
     return sucesores
 
 def busquedaArbol(problema,frontera):
@@ -71,6 +73,7 @@ def busquedaArbol(problema,frontera):
     frontera.append(nodo)
     while(True):
         nodo = frontera[0]
+        visitados.add(nodoaux.getIntersectionId(nodo.estado))
         if (len(frontera) == 0):
             return Exception
         frontera.remove(nodo)
