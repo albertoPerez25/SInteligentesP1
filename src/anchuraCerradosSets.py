@@ -1,7 +1,9 @@
 from cargadorjson import nodoaux,problema
+
 #Para analiticas de ver cuanto tarda en ejecutarse
 import time
 start = time.time()
+ 
 
 class Nodo:
     def __init__(self, interseccion, padre = None, accion = None, coste = 0, profundidad = 0):
@@ -57,32 +59,34 @@ def listaSolucion(nodo):
     sol.append(aux.estado)
     return sol
 
-frontera = []
+visitados = set() #para no volver a expandir nodos ya visitados
 
 def expandir(nodo,problema):
     sucesores = []
     for (accion,resultado) in Sucesor(problema,nodo):
-        s = Nodo(resultado, nodo, accion)
-        s.coste = nodo.coste + costeIndividual(nodo,accion,s)
-        s.profundidad = nodo.profundidad + 1
-        sucesores.append(s)
+        if (not (nodoaux.getIntersectionId(resultado) in visitados)):
+            s = Nodo(resultado, nodo, accion)
+            s.coste = nodo.coste + costeIndividual(nodo,accion,s)
+            s.profundidad = nodo.profundidad + 1
+            sucesores.append(s)
     return sucesores
 
 def busquedaArbol(problema,frontera):
     estado = Estado(nodoaux.getIntersection(problema["inicial"]))
     nodo = Nodo(estado.nodo)
-    frontera.append(nodo)
+    frontera.add(nodo)
     while(True):
-        nodo = frontera[0]
+        nodo = next(iter(frontera))
+        visitados.add(nodoaux.getIntersectionId(nodo.estado))
         if (len(frontera) == 0):
             return Exception
         frontera.remove(nodo)
         if (testObjetivo(nodo,problema)):
             return listaSolucion(nodo)
         nose = expandir(nodo,problema)
-        frontera.extend(nose)
+        frontera = frontera.union(nose)
 
-fin = busquedaArbol(problema,[])
+fin = busquedaArbol(problema,set())
 print(f"\nAlgoritmo de búsqueda de árbol en anchura")
 print(f"Inicio: {problema["inicial"]} \nFinal: {problema["final"]}\n")
 for i in fin:

@@ -1,4 +1,7 @@
 from cargadorjson import nodoaux,problema
+#Para analiticas de ver cuanto tarda en ejecutarse
+import time
+start = time.time()
 
 class Nodo:
     def __init__(self, interseccion, padre = None, accion = None, coste = 0, profundidad = 0):
@@ -99,3 +102,7 @@ print(f"\nFIN DEL ALGORITMO")
 #devolver todos pero guardarlos en otra lista a parte, y cuando len(frontera) == 0
 #en vez de una excepcion hacer que nodo = lista[+1] , que nodo sea el siguiente en la lista
 #y se borra.
+
+end = time.time()
+print("Tiempo de ejecución :",
+      (end-start) * 10**3, "ms")
