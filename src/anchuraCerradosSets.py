@@ -93,7 +93,7 @@ def busquedaArbol(problema,frontera):
 
 fin = busquedaArbol(problema,set())
 print(f"\nAlgoritmo de búsqueda de árbol en anchura")
-print(f"Inicio: {problema["inicial"]} \nFinal: {problema["final"]}\n")
+print(f"Inicio: {problema['inicial']} \nFinal: {problema['final']}\n")
 for i in fin:
     print(i)
 print(f"\nFIN DEL ALGORITMO")
