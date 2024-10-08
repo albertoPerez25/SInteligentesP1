@@ -79,7 +79,7 @@ def expandir(nodo,problema):
             sucesores.append(s)
     return sucesores
 
-def busquedaArbol(problema,frontera):
+def busqueda(problema,frontera):
     estado = Estado(problema)
     nodo = Nodo(estado.nodoInicio)
     frontera.add(nodo)
@@ -94,7 +94,7 @@ def busquedaArbol(problema,frontera):
         nose = expandir(nodo,problema)
         frontera = frontera.union(nose)
 
-fin = busquedaArbol(problema,set())
+fin = busqueda(problema,set())
 print(f"\nAlgoritmo de búsqueda de árbol en anchura")
 print(f"Inicio: {problema['inicial']} \nFinal: {problema['final']}\n")
 for i in fin:
@@ -116,4 +116,8 @@ end = time.time()
 print("Tiempo de ejecución :",
       (end-start) * 10**3, "ms")
 
-#kjdsgaljdgfh
+#Crear clase problema (cargadorjson)
+#clase busqueda => busqueda(), meter tb expandir y sucesor
+#clase metodoSiguiente => en el return de expandir
+#En algun otro metodoSiguiente habra logica para seleccionar el proximo nodo a expandir
+#Accion clase que almacena segmentos
