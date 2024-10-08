@@ -32,7 +32,11 @@ class Nodo:
 
 class Estado:
     def __init__(self,problema):
-        self.nodo = problema
+        self.nodoInicio = nodoaux.getIntersection(problema["inicial"])
+        self.nodoFinal = nodoaux.getIntersection(problema["final"]) 
+        self.IdInicio = problema["inicial"]
+        self.IdFinal = problema["final"]
+        
 
 def Sucesor(problema, estado):
     ret = set()
@@ -44,8 +48,8 @@ def Sucesor(problema, estado):
         tupla = (accion, sucesor)
         ret.add(tupla)
 
-def testObjetivo(nodo,problema):
-    return nodoaux.getIntersectionId(nodo.estado) == problema["final"]
+def testObjetivo(nodo,estado):
+    return nodoaux.getIntersectionId(nodo.estado) == estado.IdFinal
 
 def costeIndividual(origen,calle,destino):
     return nodoaux.getDistanceOf(calle) / nodoaux.getSpeedOf(calle)
@@ -59,12 +63,13 @@ def listaSolucion(nodo):
     sol.append(aux.estado)
     return sol
 
-visitados = set() #para no volver a expandir nodos ya visitados
+#cerrados:
+cerrados = set() #para no volver a expandir nodos ya visitados
 
 def expandir(nodo,problema):
     sucesores = []
     for (accion,resultado) in Sucesor(problema,nodo):
-        if (not (nodoaux.getIntersectionId(resultado) in visitados)):
+        if (not (nodoaux.getIntersectionId(resultado) in cerrados)):
             s = Nodo(resultado, nodo, accion)
             s.coste = nodo.coste + costeIndividual(nodo,accion,s)
             s.profundidad = nodo.profundidad + 1
@@ -72,16 +77,16 @@ def expandir(nodo,problema):
     return sucesores
 
 def busquedaArbol(problema,frontera):
-    estado = Estado(nodoaux.getIntersection(problema["inicial"]))
-    nodo = Nodo(estado.nodo)
+    estado = Estado(problema)
+    nodo = Nodo(estado.nodoInicio)
     frontera.add(nodo)
     while(True):
         nodo = next(iter(frontera))
-        visitados.add(nodoaux.getIntersectionId(nodo.estado))
+        cerrados.add(nodoaux.getIntersectionId(nodo.estado))
         if (len(frontera) == 0):
             return Exception
         frontera.remove(nodo)
-        if (testObjetivo(nodo,problema)):
+        if (testObjetivo(nodo,estado)):
             return listaSolucion(nodo)
         nose = expandir(nodo,problema)
         frontera = frontera.union(nose)
