@@ -1,3 +1,6 @@
+#GRUPO 9
+#ALBERTO PEREZ ALVAREZ
+#MARCOS LOPEZ GOMEZ
 from cargadorjson import nodoaux,problema
 
 #Para analiticas de ver cuanto tarda en ejecutarse
@@ -112,3 +115,5 @@ print(f"\nFIN DEL ALGORITMO")
 end = time.time()
 print("Tiempo de ejecución :",
       (end-start) * 10**3, "ms")
+
+#kjdsgaljdgfh
