@@ -1,4 +1,4 @@
-#GRUPO 9
+#GRUPO 9 - 3ºB esiiab
 #ALBERTO PEREZ ALVAREZ
 #MARCOS LOPEZ GOMEZ
 
@@ -39,12 +39,12 @@ class Problema:
             "inicial":data["initial"],
             "final":data["final"]
         }
-        #Agregar metodos de nodoAux que usen intersection_dic
-        def getIntersection(self, id):
-            return self.intersections_dic[id]
-    
-        def getIntersectionId(self, intersection):
-            return intersection.identifier
+    #Agregar metodos de nodoAux que usen intersection_dic
+    def getIntersection(self, id):
+        return self.intersection_dic[id]
+
+    def getIntersectionId(self, intersection):
+        return intersection.identifier
 
 class Accion:
     class Segment:
@@ -75,8 +75,9 @@ class Accion:
     
     def getDistanceOf(self, segment):
         return segment.distance
-    
 
+problema = Problema(data)
+accion = Accion(data)
 
 #Habra metodos de nodoAux que quizas usen tanto segments como intersections_dic, esos habra que meterlos en otra clase especial para ellos
 class Operaciones:
@@ -88,17 +89,47 @@ class Operaciones:
     #que se le pase como parametro
     def getAllNearIntersections(self,id):
         listasospechosamentesospechosa = []
-        test = self.getSegmentsOf(id)
+        test = accion.getSegmentsOf(id)
         for i in range(0,len(test)):
             print(self.intersections_dic[test[i].destination])
             listasospechosamentesospechosa.append(self.intersection_dic[test[i].destination])
         return listasospechosamentesospechosa
     
     def getDestinationOf(self,segment):
-        return self.intersection_dic[segment.destination]
+        return self.intersections_dic[segment.destination]
 
-#Pruebas
-problema = Problema(data)
-accion = Accion(data)
-Operaciones = Operaciones(problema.intersection_dic, accion.segments)
-print(f"{problema.intersection_dic} {problema.extremo["inicial"]} {problema.extremo["final"]}")
+
+operaciones = Operaciones(problema.intersection_dic, accion.segments)
+class Nodo:
+    def __init__(self, interseccion, padre = None, accionTomada = None, coste = 0, profundidad = 0):
+        self.estado = interseccion
+        self.padre = padre
+        self.accion = accionTomada
+        self.coste = coste
+        self.profundidad = profundidad
+
+        #Lista de calles de la interseccion
+        self.calles = accion.getSegmentsOf(problema.getIntersectionId(self.estado))
+        self.it = 0 #Iterador para self.calles
+        
+    def __str__(self):
+        return f"Nodo(estado={self.estado}, padre={self.padre}, accion={self.accion}, coste={self.coste}, profundidad={self.profundidad})"
+
+    #Devuelve la siguiente calle de la interseccion
+    def getNextSegment(self,segments = []):
+        if (len(segments) == 0):
+            segments = self.calles
+        if (self.it >= len(segments)):
+            return None
+        segment = segments[self.it]
+        self.it = self.it + 1
+        return segment
+
+class Estado:
+    def __init__(self,problema):
+        self.nodoInicio = problema.getIntersection(problema.extremo["inicial"])
+        self.nodoFinal = problema.getIntersection(problema.extremo["final"]) 
+        self.IdInicio = problema.extremo["inicial"]
+        self.IdFinal = problema.extremo["final"]
+estado = Estado(problema)
+
