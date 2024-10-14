@@ -3,10 +3,11 @@
 #MARCOS LOPEZ GOMEZ
 
 import json
+from math import sqrt
 
-RUTAJSON = '/home/calberto/Documents/Uni/5toCuatri/SistemasInteligentes/Practicas/P1/pr1_SSII/Proyecto/recursos/problems/test/test.json'
+#RUTAJSON = '/home/calberto/Documents/Uni/5toCuatri/SistemasInteligentes/Practicas/P1/pr1_SSII/Proyecto/recursos/problems/test/test.json'
 #RUTAJSON = '/home/calberto/Documents/Uni/5toCuatri/SistemasInteligentes/Practicas/P1/pr1_SSII/Proyecto/recursos/problems/medium/calle_maria_marin_500_0.json'
-#RUTAJSON = '/home/marcos/Documentos/3_Uni/Sistemas_Inteligentes/Programas_python/SInteligentesP1/recursos/problems/medium/calle_maria_marin_500_0.json'
+RUTAJSON = '/home/marcos/Documentos/3_Uni/Sistemas_Inteligentes/Programas_python/SInteligentesP1/recursos/problems/medium/calle_maria_marin_500_0.json'
 
 with open(RUTAJSON, 'r') as file:
     data = json.load(file)
@@ -27,12 +28,26 @@ class Problema:
         self.data=data
  
         #Pasamos las intersecciones del JSON a a un conjunto de objetos
-        self.intersections = set()
-        for intersection in self.data['intersections']:
-            self.intersections.add(self.Intersection(intersection['identifier'], intersection['latitude'], intersection['longitude']))
+        #self.intersections = set()
+        #for intersection in self.data['intersections']:
+        #    self.intersections.add(self.Intersection(intersection['identifier'], intersection['latitude'], intersection['longitude']))
 
         #convertimos el conjunto de intersections a un diccionario
-        self.intersection_dic = {i.identifier: i for i in self.intersections}
+        #self.intersection_dic = {i.identifier: i for i in self.intersections}
+
+        ####PRUEBAS{
+        #print(self.intersection_dic)
+        #print()
+
+        #self.intersection_dic.clear()
+
+        #Pasamos las intersecciones del JSON a un nuevo diccionario
+        self.intersection_dic = {}
+        for intersection in self.data['intersections']:
+            self.intersection_dic.update({intersection['identifier']:self.Intersection(intersection['identifier'], intersection['latitude'], intersection['longitude'])})
+        
+        #print(self.intersection_dic)
+        ####}
 
         #Cargamos en el diccionario extremo los nodos iniciales y finales del JSON
         self.extremo = {
@@ -53,12 +68,16 @@ class Accion:
             self.destination = destination
             self.distance = distance
             self.speed = speed
+            
 
     def __init__(self,data):
         self.data = data
+        self.maxSpeed = 0
 
         self.segments = set()
         for seg in self.data['segments']:
+            if (seg['speed'] > self.maxSpeed):
+                self.maxSpeed = seg['speed']
             self.segments.add(self.Segment(seg['origin'], seg['destination'], seg['distance'], seg['speed']))
         
         #Segmentos no tiene sentido pasarlo a diccionario pues no tiene un campo id único
@@ -131,5 +150,17 @@ class Estado:
         self.nodoFinal = problema.getIntersection(problema.extremo["final"]) 
         self.IdInicio = problema.extremo["inicial"]
         self.IdFinal = problema.extremo["final"]
+
+    def getDistanceToFinal(self, nodo):
+        #Dos heuristicas:
+        #Restar long y lat iniciales menos finales
+        Ha = abs(nodo.estado.latitude - self.nodoFinal.latitude) + abs(nodo.estado.longitude - self.nodoFinal.longitude)
+        #Pitágoras
+        Hb = sqrt((nodo.estado.latitude - self.nodoFinal.latitude)**2 + (nodo.estado.longitude - self.nodoFinal.longitude)**2)
+        #Ha da distancias mayores que Hb.
+        #print("Ha: ",Ha)
+        #print("Hb: ",Hb)
+        return Ha
+    
 estado = Estado(problema)
 
