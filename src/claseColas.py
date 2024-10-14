@@ -11,7 +11,7 @@ class ColaHeuristica:
         aux = 0
         sol = None
         for nodo in frontera:
-            aux = estado.getDistanceToFinal(nodo)         
+            aux = estado.getDistanceToFinal(nodo) * accion.maxSpeed #Han dicho en clase de usar velocidad. No le veo sentido 
             if (aux < dist):
                 dist = aux
                 sol = nodo
