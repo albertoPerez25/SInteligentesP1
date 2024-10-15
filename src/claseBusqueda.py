@@ -46,6 +46,7 @@ class Busqueda:
         self.frontera.add(self.nodo) 
         while(True):
             self.nodo = self.seleccionSiguienteNodo(self.frontera)
+            #estado = Estado()
             self.cerrados.add(problema.getIntersectionId(self.nodo.estado))
             if (len(self.frontera) == 0):
                 return Exception
@@ -55,5 +56,20 @@ class Busqueda:
             nose = self.expandir(self.nodo,problema)
             self.frontera = self.frontera.union(nose)
 
+# Expandir -> Entra un nodo.Coge todos las intersecciones posibles y las mete a frontera. Id mas bajo primero
+# Accion -> 
+# Estado -> Quitar inicio y final y ponerlos en problema OTRA VEZ
+# Estado -> dentro de nodo. Tiene solo los atributos de la interseccion
+# Cerrados -> Identificador
+# Frontera -> Lista
+# Segmento -> Diccionario
+# Heuristica -> en ClaseBúsqueda
+# Estado -> tener basicamente todas las operaciones. Tendrá el nodo actual almacenado asi que no habra
+# que pasarle la interseccion / seccion a cada metodo
+# Heuristica -> Mediante una PriorityQueue(Id,Nodo)
+# lt(a,b) -> a<b
+# ll(a,b) -> a<=b
+# eq(a,b) -> a==b
+# ge(a,b) -> a>=b
+# gt(a,b) -> a>b
 
-    

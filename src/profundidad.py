@@ -8,7 +8,7 @@ class BusquedaProfundidad(Busqueda):
     def seleccionSiguienteNodo(self, frontera):
         for i in frontera:
             nodo=i
-        return i
+        return nodo
 print(f"\nBusqueda en Profundidad:\n")
 nodos=BusquedaProfundidad().bus()
 for i in nodos:
