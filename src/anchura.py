@@ -8,7 +8,7 @@ class BusquedaAnchura(Busqueda):
         super().__init__(cerrados)
 
     def seleccionSiguienteNodo(self, frontera):
-        return next(iter(frontera))
+        return frontera[0]
 
 print(f"\nBusqueda en Anchura:\n")
 fin = BusquedaAnchura().bus()

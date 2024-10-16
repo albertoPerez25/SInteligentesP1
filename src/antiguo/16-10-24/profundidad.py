@@ -6,7 +6,9 @@ class BusquedaProfundidad(Busqueda):
     def __init__(self, cerrados = set()):
         super().__init__(cerrados)
     def seleccionSiguienteNodo(self, frontera):
-        return frontera[-1]
+        for i in frontera:
+            nodo=i
+        return nodo
 print(f"\nBusqueda en Profundidad:\n")
 nodos=BusquedaProfundidad().bus()
 for i in nodos:

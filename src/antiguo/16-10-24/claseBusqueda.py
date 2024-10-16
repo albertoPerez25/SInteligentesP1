@@ -4,7 +4,7 @@ class Busqueda:
     def __init__(self,cerrados = set()):
         self.cerrados = cerrados #para no volver a expandir nodos ya visitados
         self.nodo = Nodo(estado.nodoInicio)
-        self.frontera = []
+        self.frontera = set()
         #Para expandir nodos
 
     def Sucesor(self,problema, nodoActual):
@@ -32,12 +32,7 @@ class Busqueda:
         sol.append(aux.estado)
         return sol
 
-  
-
     def expandir(self,nodo,problema):
-        def orden(n):
-            return problema.getIntersectionId(n.estado)
-        
         sucesores = []
         for (accionTomada,resultado) in self.Sucesor(problema,nodo):
             if (not (problema.getIntersectionId(resultado) in self.cerrados)):
@@ -45,11 +40,10 @@ class Busqueda:
                 s.coste = nodo.coste + self.costeIndividual(nodo,accionTomada,s)
                 s.profundidad = nodo.profundidad + 1
                 sucesores.append(s)
-        sucesores.sort(key = orden)
         return sucesores
 
     def bus(self):
-        self.frontera.append(self.nodo) 
+        self.frontera.add(self.nodo) 
         while(True):
             self.nodo = self.seleccionSiguienteNodo(self.frontera)
             #estado = Estado()
@@ -60,25 +54,19 @@ class Busqueda:
             if (self.testObjetivo(self.nodo,estado)):
                 return self.listaSolucion(self.nodo)
             nose = self.expandir(self.nodo,problema)
-            self.frontera.extend(nose)
+            self.frontera = self.frontera.union(nose)
 
-#TAREAS A HACER
-# 1.!HECHO Expandir -> Entra un nodo.Coge todos las intersecciones posibles y las mete a frontera. Id mas bajo primero
-# 2.!HECHO Frontera -> Lista
-# 3.!HECHO Accion -> Tiene un solo segmento guardado. El de la clase nodo. Dentro de nodo.
-# 4.!HECHO Estado -> Quitar inicio y final y ponerlos en problema OTRA VEZ
-# 5.!HECHO Estado -> dentro de nodo. Tiene solo los atributos de la interseccion
-# 6.!HECHO Nodo -> tener basicamente todas las operaciones. Tendrá el nodo actual almacenado asi que no habra
-#                  que pasarle la interseccion / seccion a cada metodo
-# 7.ClaseBusqueda -> Cambiar llamadas a metodos por las nuevas
-# 8.Actualizar metodos de algoritmos para llamar a los nuevos metodos
-# 9.Segmento -> Diccionario
-# 10.Heuristica -> en ClaseBúsqueda
-# 11.Heuristica -> Mediante una PriorityQueue(Id,Nodo)
-
-#OTRAS NOTAS
+# Expandir -> Entra un nodo.Coge todos las intersecciones posibles y las mete a frontera. Id mas bajo primero
+# Accion -> Tiene un solo segmento guardado. El de la clase nodo. Dentro de nodo.
+# Estado -> Quitar inicio y final y ponerlos en problema OTRA VEZ
+# Estado -> dentro de nodo. Tiene solo los atributos de la interseccion
 # Cerrados -> Identificador
-
+# Frontera -> Lista
+# Segmento -> Diccionario
+# Heuristica -> en ClaseBúsqueda
+# Estado -> tener basicamente todas las operaciones. Tendrá el nodo actual almacenado asi que no habra
+# que pasarle la interseccion / seccion a cada metodo
+# Heuristica -> Mediante una PriorityQueue(Id,Nodo)
 # lt(a,b) -> a<b
 # ll(a,b) -> a<=b
 # eq(a,b) -> a==b

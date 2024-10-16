@@ -15,63 +15,21 @@ with open(RUTAJSON, 'r') as file:
 
 class Problema:   
     #Creamos clases para tener objetos que contengan las intersecciones
-    class Intersection:
-            def __init__(self, id, latitude, longitude):
-                self.identifier = id
-                self.latitude = latitude
-                self.longitude = longitude
-
-            def __str__(self):
-                return f"Interseccion: (id={self.identifier}, latitud={self.latitude}, longitud={self.longitude})"
+        #Ahora estas clases son Estado(para intersecciones) y Accion(para segmentos/calles)
 
     #Constructor de Problema
     def __init__(self,data):
         self.data=data
- 
-        #Pasamos las intersecciones del JSON a a un conjunto de objetos
-        #self.intersections = set()
-        #for intersection in self.data['intersections']:
-        #    self.intersections.add(self.Intersection(intersection['identifier'], intersection['latitude'], intersection['longitude']))
-
-        #convertimos el conjunto de intersections a un diccionario
-        #self.intersection_dic = {i.identifier: i for i in self.intersections}
-
-        ####PRUEBAS{
-        #print(self.intersection_dic)
-        #print()
-
-        #self.intersection_dic.clear()
-
         #Pasamos las intersecciones del JSON a un nuevo diccionario
         self.intersection_dic = {}
         for intersection in self.data['intersections']:
-            self.intersection_dic.update({intersection['identifier']:self.Intersection(intersection['identifier'], intersection['latitude'], intersection['longitude'])})
-        
-        #print(self.intersection_dic)
-        ####}
+            self.intersection_dic.update({intersection['identifier']:Estado(intersection['identifier'], intersection['latitude'], intersection['longitude'])})
 
         #Cargamos en el diccionario extremo los nodos iniciales y finales del JSON
         self.extremo = {
             "inicial":data["initial"],
             "final":data["final"]
         }
-    #Agregar metodos de nodoAux que usen intersection_dic
-    def getIntersection(self, id):
-        return self.intersection_dic[id]
-
-    def getIntersectionId(self, intersection):
-        return intersection.identifier
-
-class Accion:
-    class Segment:
-        def __init__(self, origin, destination, distance, speed):
-            self.origin = origin
-            self.destination = destination
-            self.distance = distance
-            self.speed = speed
-            
-
-    def __init__(self,data):
         self.data = data
         self.maxSpeed = 0
 
@@ -79,47 +37,25 @@ class Accion:
         for seg in self.data['segments']:
             if (seg['speed'] > self.maxSpeed):
                 self.maxSpeed = seg['speed']
-            self.segments.add(self.Segment(seg['origin'], seg['destination'], seg['distance'], seg['speed']))
-        
-        #Segmentos no tiene sentido pasarlo a diccionario pues no tiene un campo id único
-    #Agregar metodos de nodoAux que usen segments
-    def getSegmentsOf(self,id):
-        aux = []
-        for x in self.segments:
-            if id==x.origin:
-                aux.append(x)
-        return aux
-    
-    def getSpeedOf(self, segment):
-        return segment.speed
-    
-    def getDistanceOf(self, segment):
-        return segment.distance
+            self.segments.add(Accion(seg['origin'], seg['destination'], seg['distance'], seg['speed']))
+
+    #Agregar metodos de nodoAux que usen intersection_dic
+    def getIntersection(self, id):
+        return self.intersection_dic[id]
+
+    def getDestinationOf(self,segment):
+        return self.intersections_dic[segment.destination]
+
+class Accion:
+    def __init__(self, origin, destination, distance, speed):
+        self.origin = origin
+        self.destination = destination
+        self.distance = distance
+        self.speed = speed
 
 problema = Problema(data)
 accion = Accion(data)
 
-#Habra metodos de nodoAux que quizas usen tanto segments como intersections_dic, esos habra que meterlos en otra clase especial para ellos
-class Operaciones:
-    def __init__(self, intersections_dir, segments):
-        self.intersections_dic = intersections_dir
-        self.segments = segments
-    
-    #Devuelve las intersecciones de todos los segmentos del id de la interseccion
-    #que se le pase como parametro
-    def getAllNearIntersections(self,id):
-        listasospechosamentesospechosa = []
-        test = accion.getSegmentsOf(id)
-        for i in range(0,len(test)):
-            print(self.intersections_dic[test[i].destination])
-            listasospechosamentesospechosa.append(self.intersection_dic[test[i].destination])
-        return listasospechosamentesospechosa
-    
-    def getDestinationOf(self,segment):
-        return self.intersections_dic[segment.destination]
-
-
-operaciones = Operaciones(problema.intersection_dic, accion.segments)
 class Nodo:
     def __init__(self, interseccion, padre = None, accionTomada = None, coste = 0, profundidad = 0):
         self.estado = interseccion
@@ -135,6 +71,9 @@ class Nodo:
     def __str__(self):
         return f"Nodo(estado={self.estado}, padre={self.padre}, accion={self.accion}, coste={self.coste}, profundidad={self.profundidad})"
 
+    def __eq__(self,otro):
+        return self.estado.eq(otro.estado) and self.accion.eq(otro.accion) and self.padre.eq(otro.padre)
+
     #Devuelve la siguiente calle de la interseccion
     def getNextSegment(self,segments = []):
         if (len(segments) == 0):
@@ -144,15 +83,63 @@ class Nodo:
         segment = segments[self.it]
         self.it = self.it + 1
         return segment
+    
+    #Agregar metodos de nodoAux que usen intersection_dic
+    def getIntersectionId(self, intersection = None):
+        if(intersection == None):
+            return self.estado.identifier
+        return intersection.identifier
+    
+    def getLatitude(self, intersection = None): #NOUSADO
+        if(intersection == None):
+            return self.estado.latitude
+        return intersection.latitude
+    
+    def getLongitude(self, intersection = None): #NOUSADO
+        if(intersection == None):
+            return self.estado.longitude
+        return intersection.longitude
+    
+    #Agregar metodos de nodoAux que usen segments
+    def getSegmentsOf(self,id = None):
+        aux = []
+        if(id==None):
+            id = self.estado.identifier
+        for x in self.segments:
+            if id==x.origin:
+                aux.append(x)
+        return aux
+    
+    def getSpeedOf(self, segment = None):
+        if(segment == None):
+            return self.accion.speed
+        return segment.speed
+    
+    def getDistanceOf(self, segment = None):
+        if(segment == None):
+            return self.accion.distance
+        return segment.distance
 
-class Estado:
-    def __init__(self,problema):
-        self.nodoInicio = problema.getIntersection(problema.extremo["inicial"])
-        self.nodoFinal = problema.getIntersection(problema.extremo["final"]) 
-        self.IdInicio = problema.extremo["inicial"]
-        self.IdFinal = problema.extremo["final"]
 
-    def getDistanceToFinal(self, nodo):
+    #Habra metodos de nodoAux que quizas usen tanto segments como intersections_dic, esos habra que meterlos en otra clase especial para ellos
+        #Devuelve las intersecciones de todos los segmentos del id de la interseccion
+        #que se le pase como parametro
+    def getAllNearIntersections(self,id):#NOUSADO
+        conjuntoconunnombreinnecesariamentelargo = set()
+        test = accion.getSegmentsOf(id)
+        for i in range(0,len(test)):
+            print(self.intersections_dic[test[i].destination])
+            conjuntoconunnombreinnecesariamentelargo.add(self.intersection_dic[test[i].destination])
+        return conjuntoconunnombreinnecesariamentelargo
+    
+    def getDestinationOf(self,segment = None):
+        if segment == None:
+            return problema.getDestinationOf(self.accion)
+        return problema.getDestinationOf(segment)
+    
+    def getDistanceToFinal(self, nodo = None):
+        if (nodo == None) :
+            nodo = self
         #Dos heuristicas:
         #Restar long y lat iniciales menos finales
         Ha = abs(nodo.estado.latitude - self.nodoFinal.latitude) + abs(nodo.estado.longitude - self.nodoFinal.longitude)
@@ -162,6 +149,21 @@ class Estado:
         #print("Ha: ",Ha)
         #print("Hb: ",Hb)
         return Ha
+
+class Estado:
+    def __init__(self, id, latitude, longitude):
+        self.identifier = id
+        self.latitude = latitude
+        self.longitude = longitude
+    def __str__(self):
+        return f"Interseccion: (id={self.identifier}, latitud={self.latitude}, longitud={self.longitude})"
+    def __eq__(self, otro):
+        if not isinstance(otro, Problema.Intersection):
+            return False
+        else:
+            return self.identifier == otro.identifier
+        
+
     
 estado = Estado(problema)
 
