@@ -1,27 +1,17 @@
-from clasesBasicas import operaciones,problema,estado,accion,Nodo
+from clasesBasicas import problema,Nodo,Estado
 
 class Busqueda:
     def __init__(self,cerrados = set()):
         self.cerrados = cerrados #para no volver a expandir nodos ya visitados
-        self.nodo = Nodo(estado.nodoInicio)
+        self.nodo = Nodo(problema.nodoInicio)
         self.frontera = []
         #Para expandir nodos
 
-    def Sucesor(self,problema, nodoActual):
-        ret = set()
-        while True:
-            accionATomar = nodoActual.getNextSegment() #es uno de los segmentos de la interseccion en el nodo estado
-            if (accionATomar == None):
-                return ret
-            sucesor = operaciones.getDestinationOf(accionATomar) #es la interseccion destino de accion
-            tupla = (accionATomar, sucesor)
-            ret.add(tupla)
-
     def testObjetivo(self,nodo,estado):
-        return problema.getIntersectionId(nodo.estado) == estado.IdFinal
+        return estado.__eq__(problema.nodoFinal)
 
     def costeIndividual(self,origen,calle,destino):
-        return accion.getDistanceOf(calle) / accion.getSpeedOf(calle)
+        return origen.getDistanceOf(calle) / origen.getSpeedOf(calle)
 
     def listaSolucion(self,nodo):
         sol = []
@@ -32,16 +22,24 @@ class Busqueda:
         sol.append(aux.estado)
         return sol
 
-  
+    def sucesor(self,problema, nodoActual):
+        ret = set()
+        while True:
+            accionATomar = nodoActual.getNextSegment() #es uno de los segmentos de la interseccion en el nodo estado
+            if (accionATomar == None):
+                return ret
+            sucesorId = nodoActual.getIntersectionId(nodoActual.getDestinationOf(accionATomar)) #es la interseccion destino de accion
+            tupla = (accionATomar, sucesorId)
+            ret.add(tupla)
 
     def expandir(self,nodo,problema):
         def orden(n):
-            return problema.getIntersectionId(n.estado)
+            return nodo.getIntersectionId(n.estado)
         
         sucesores = []
-        for (accionTomada,resultado) in self.Sucesor(problema,nodo):
-            if (not (problema.getIntersectionId(resultado) in self.cerrados)):
-                s = Nodo(resultado, nodo, accionTomada)
+        for (accionTomada,resultadoId) in self.sucesor(problema,nodo):
+            if (not resultadoId in self.cerrados):
+                s = Nodo(problema.getIntersection(resultadoId), nodo, accionTomada)
                 s.coste = nodo.coste + self.costeIndividual(nodo,accionTomada,s)
                 s.profundidad = nodo.profundidad + 1
                 sucesores.append(s)
@@ -51,13 +49,13 @@ class Busqueda:
     def bus(self):
         self.frontera.append(self.nodo) 
         while(True):
-            self.nodo = self.seleccionSiguienteNodo(self.frontera)
-            #estado = Estado()
-            self.cerrados.add(problema.getIntersectionId(self.nodo.estado))
             if (len(self.frontera) == 0):
                 return Exception
+            self.nodo = self.seleccionSiguienteNodo(self.frontera)
+            #estado = Estado()
+            self.cerrados.add(self.nodo.getIntersectionId(self.nodo.estado))
             self.frontera.remove(self.nodo)
-            if (self.testObjetivo(self.nodo,estado)):
+            if (self.testObjetivo(self.nodo,self.nodo.estado)):
                 return self.listaSolucion(self.nodo)
             nose = self.expandir(self.nodo,problema)
             self.frontera.extend(nose)
@@ -70,8 +68,8 @@ class Busqueda:
 # 5.!HECHO Estado -> dentro de nodo. Tiene solo los atributos de la interseccion
 # 6.!HECHO Nodo -> tener basicamente todas las operaciones. Tendrá el nodo actual almacenado asi que no habra
 #                  que pasarle la interseccion / seccion a cada metodo
-# 7.ClaseBusqueda -> Cambiar llamadas a metodos por las nuevas
-# 8.Actualizar metodos de algoritmos para llamar a los nuevos metodos
+# 7.!HECHO ClaseBusqueda -> Cambiar llamadas a metodos por las nuevas
+# 8.!HECHO Actualizar metodos de algoritmos para llamar a los nuevos metodos
 # 9.Segmento -> Diccionario
 # 10.Heuristica -> en ClaseBúsqueda
 # 11.Heuristica -> Mediante una PriorityQueue(Id,Nodo)

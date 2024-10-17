@@ -1,4 +1,4 @@
-from clasesBasicas import problema,Nodo
+from clasesBasicas import operaciones,problema,estado,accion,Nodo
 from claseBusqueda import Busqueda
 
 class ColaHeuristica:
@@ -11,7 +11,7 @@ class ColaHeuristica:
         aux = 0
         sol = None
         for nodo in frontera:
-            aux = Nodo.getDistanceToFinal(nodo) * problema.maxSpeed #Han dicho en clase de usar velocidad. No le veo sentido 
+            aux = estado.getDistanceToFinal(nodo) * accion.maxSpeed #Han dicho en clase de usar velocidad. No le veo sentido 
             if (aux < dist):
                 dist = aux
                 sol = nodo
@@ -19,7 +19,7 @@ class ColaHeuristica:
 
     def storeDistances(self, intersections):
         for nodo in intersections:
-            self.diccionario.update({"Id": Nodo.getIntersectionId(nodo),"Distancia":Nodo.getDistanceToFinal(nodo)})
+            self.diccionario.update({"Id": problema.getIntersectionId(nodo),"Distancia":estado.getDistanceToFinal(nodo)})
 
     def getLeastDistanceFromStored(self, frontera):
         dist = 999999999
