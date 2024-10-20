@@ -1,12 +1,21 @@
 from clasesBasicas import problema,Nodo,Estado
-import heapq
+import heapq,time
+
 
 class Busqueda:
     def __init__(self,cerrados = set()):
+        self.tInicio = 0
+        self.tFinal = 0
         self.cerrados = cerrados #para no volver a expandir nodos ya visitados
         self.nodo = Nodo(problema.nodoInicio)
         self.frontera = []
         #Para expandir nodos
+        #estadisticas:
+        self.nExpandidos = 0
+        self.nProfundidad = 0
+        self.nCosteTotal = 0 #nodo.coste es acumulativo
+        self.nExplorados = 0
+        #self.nGenerados = 0
         
     def merge_priority_queues(self,pq1,pq2):
         merged_pq = []
@@ -26,11 +35,22 @@ class Busqueda:
 
     def listaSolucion(self,nodo):
         sol = []
+        solId = []
         aux = nodo
+        self.nCosteTotal = aux.coste
         while (aux.padre):
             sol.append(aux.estado)
+            solId.append(aux.getIntersectionId())
             aux = aux.padre
         sol.append(aux.estado)
+        solId.append(aux.getIntersectionId())
+        solId.reverse()
+        print(solId)
+        print("Expandidos: ",self.nExpandidos)
+        print("Explorados: ",self.nExplorados)
+        print("Profundidad: ",self.nProfundidad)
+        print("Coste Total: ",self.nCosteTotal)
+        print("Tiempo de ejecución algoritmo: ",(self.tFinal-self.tInicio) * 10**3, "ms")
         return sol
 
     def sucesor(self,problema, nodoActual):
@@ -38,6 +58,7 @@ class Busqueda:
         accionATomar = nodoActual.getNextSegment() #es uno de los segmentos de la interseccion en el nodo estado
         while accionATomar != None:  
             sucesorId = nodoActual.getIntersectionId(nodoActual.getDestinationOf(accionATomar)) #es la interseccion destino de accion
+            self.nExplorados = self.nExplorados + 1
             if (not sucesorId in self.cerrados):
                 tupla = (accionATomar, sucesorId)
                 ret.add(tupla)
@@ -50,20 +71,29 @@ class Busqueda:
             s = Nodo(problema.getIntersection(resultadoId), nodo, accionTomada)
             s.coste = nodo.coste + self.costeIndividual(nodo,accionTomada,s)
             s.profundidad = nodo.profundidad + 1
+            if s.profundidad > self.nProfundidad:
+                self.nProfundidad = s.profundidad
             sucesores = self.añadir(s,sucesores)
             self.cerrados.add(s.getIntersectionId(s.estado))
         return sucesores
 
     def bus(self):
+        self.tInicio = time.time()
         self.frontera = self.añadir(self.nodo)
+        self.nExplorados = self.nExplorados + 1
         self.cerrados.add(self.nodo.getIntersectionId(self.nodo.estado))
         while(len(self.frontera) != 0):
             self.nodo = heapq.heappop(self.frontera)[1]
             if (self.testObjetivo(self.nodo,self.nodo.estado)):
+                self.tFinal = time.time()
                 return self.listaSolucion(self.nodo)
             nose = self.expandir(self.nodo,problema)
+            self.nExpandidos = self.nExpandidos + 1
             self.frontera = self.merge_priority_queues(self.frontera, nose)
         raise Exception("Frontera vacia")
+    
+
+
     
 
 #TAREAS A HACER

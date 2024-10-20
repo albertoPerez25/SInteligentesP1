@@ -11,15 +11,11 @@ class BusquedaAnchura(Busqueda):
     def añadir(self, nodo, pq = None):
         if pq == None:
             pq = self.frontera
-        
         heapq.heappush(pq,(nodo.getIntersectionId(),nodo))
         return pq
 
 print(f"\nBusqueda en Anchura:\n")
-fin = BusquedaAnchura().bus()
-for i in fin:
-    print(i)
-print(f"\nFIN DEL ALGORITMO")
+listaEstados = BusquedaAnchura().bus()
 
 end = time.time()
-print("Tiempo de ejecución :",(end-start) * 10**3, "ms")
+print("Tiempo de ejecución total:",(end-start) * 10**3, "ms")

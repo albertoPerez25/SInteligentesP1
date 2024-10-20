@@ -5,15 +5,15 @@
 import json
 from math import sqrt
 
-#RUTAJSON = '/home/calberto/Documents/Uni/5toCuatri/SistemasInteligentes/Practicas/P1/pr1_SSII/Proyecto/recursos/problems/large/calle_f_albacete_5000_4.json'
-RUTAJSON = '/home/calberto/Documents/Uni/5toCuatri/SistemasInteligentes/Practicas/P1/pr1_SSII/Proyecto/recursos/problems/huge/calle_agustina_aroca_albacete_5000_0.json'
-#RUTAJSON = '/home/calberto/Documents/Uni/5toCuatri/SistemasInteligentes/Practicas/P1/pr1_SSII/Proyecto/recursos/problems/test/test.json'
-#RUTAJSON = '/home/calberto/Documents/Uni/5toCuatri/SistemasInteligentes/Practicas/P1/pr1_SSII/Proyecto/recursos/problems/medium/calle_maria_marin_500_0.json'
-#RUTAJSON = '/home/marcos/Documentos/3_Uni/Sistemas_Inteligentes/Programas_python/SInteligentesP1/recursos/problems/medium/calle_maria_marin_500_0.json'
-#RUTAJSON = '/home/marcos/Documentos/3_Uni/Sistemas_Inteligentes/Programas_python/SInteligentesP1/recursos/problems/test/test.json'
+Al_Large1 = '/home/calberto/Documents/Uni/5toCuatri/SistemasInteligentes/Practicas/P1/pr1_SSII/Proyecto/recursos/problems/large/calle_f_albacete_5000_4.json'
+Al_Huge1 = '/home/calberto/Documents/Uni/5toCuatri/SistemasInteligentes/Practicas/P1/pr1_SSII/Proyecto/recursos/problems/huge/calle_agustina_aroca_albacete_5000_0.json'
+Al_Test1 = '/home/calberto/Documents/Uni/5toCuatri/SistemasInteligentes/Practicas/P1/pr1_SSII/Proyecto/recursos/problems/test/test.json'
+Al_Medium1 = '/home/calberto/Documents/Uni/5toCuatri/SistemasInteligentes/Practicas/P1/pr1_SSII/Proyecto/recursos/problems/medium/calle_maria_marin_500_0.json'
+Ma_Medium1 = '/home/marcos/Documentos/3_Uni/Sistemas_Inteligentes/Programas_python/SInteligentesP1/recursos/problems/medium/calle_maria_marin_500_0.json'
+Ma_Test1 = '/home/marcos/Documentos/3_Uni/Sistemas_Inteligentes/Programas_python/SInteligentesP1/recursos/problems/test/test.json'
 
-with open(RUTAJSON, 'r') as file:
-    data = json.load(file)
+RUTAJSON = Al_Test1
+
 
 #Interseccion:
 class Estado:
@@ -44,8 +44,10 @@ class Problema:
         #Ahora estas clases son Estado(para intersecciones) y Accion(para segmentos/calles)
 
     #Constructor de Problema
-    def __init__(self,data):
-        self.data=data
+    def __init__(self,ruta):
+        with open(ruta, 'r') as file:
+            self.data = json.load(file)
+       
         #Pasamos las intersecciones del JSON a un nuevo diccionario
         self.intersection_dic = {}
         for intersection in self.data['intersections']:
@@ -53,13 +55,12 @@ class Problema:
 
         #Cargamos en el diccionario extremo los nodos iniciales y finales del JSON
         self.extremo = {
-            "idInicial":data["initial"],
-            "idFinal":data["final"]
+            "idInicial":self.data["initial"],
+            "idFinal":self.data["final"]
         }
         self.nodoInicio = self.getIntersection(self.extremo["idInicial"])
         self.nodoFinal = self.getIntersection(self.extremo["idFinal"]) 
 
-        self.data = data
         self.maxSpeed = 0
 
         self.segments = set()
@@ -67,6 +68,7 @@ class Problema:
             if (seg['speed'] > self.maxSpeed):
                 self.maxSpeed = seg['speed']
             self.segments.add(Accion(seg['origin'], seg['destination'], seg['distance'], seg['speed']))
+            self.segments.add(Accion(seg['destination'], seg['origin'], seg['distance'], seg['speed'])) #Por doble sentido en las calles. Muy ineficiente
 
     #Agregar metodos de nodoAux que usen intersection_dic
     def getIntersection(self, id):
@@ -83,19 +85,16 @@ class Problema:
                 aux.append(x)
         return aux
 
-problema = Problema(data)
+problema = Problema(RUTAJSON)
 
 class Nodo:
-    def __init__(self, interseccion, padre = None, accionTomada = Accion(1,1,1,1), coste = 0, profundidad = 0):
+    def __init__(self, interseccion, padre = None, accionTomada = None, coste = 0, profundidad = 0):
         self.estado = interseccion
         self.padre = padre
         self.accion = accionTomada
         self.coste = coste
         self.profundidad = profundidad
-        #Estado(interseccion.identifier, interseccion.latitude, interseccion.longitude)
-        #Accion(accionTomada.origin, accionTomada.destination, accionTomada.distance, accionTomada.speed)
-        #Lista de calles de la interseccion
-        self.calles = self.getSegmentsOf(self.getIntersectionId(self.estado))
+        self.calles = self.getSegmentsOf(self.getIntersectionId(self.estado)) #Lista de calles de la interseccion
         self.it = 0 #Iterador para self.calles
         
     def __str__(self):
@@ -113,6 +112,8 @@ class Nodo:
     def getNextSegment(self,segments = []):
         if (len(segments) == 0):
             segments = self.calles
+            if(segments == None):
+                return None
         if (self.it >= len(segments)):
             return None
         segment = segments[self.it]
@@ -137,13 +138,21 @@ class Nodo:
     
     #Agregar metodos de nodoAux que usen segments
     def getSegmentsOf(self,id = None):
+        ret = []
         if(id==None):
-            return problema.getSegmentsOf(self.estado.identifier)
-        return problema.getSegmentsOf(id)
+            ret = problema.getSegmentsOf(self.estado.identifier)
+        else:
+            ret = problema.getSegmentsOf(id)
+        #if(self.accion == None): #Por doble sentido en las calles
+        #    return ret
+        #ret.append(problema.getSegmentsOf(self.accion.origin)) #BUG añade Lista en vez de elemento
+        return ret
     
     def getSpeedOf(self, segment = None):
         if(segment == None):
-            return self.accion.speed
+            if (self.accion != None):
+                return self.accion.speed
+            return 1    
         return segment.speed
     
     def getDistanceOf(self, segment = None):
