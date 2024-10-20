@@ -5,6 +5,7 @@
 import json
 from math import sqrt
 
+#RUTAJSON = '/home/calberto/Documents/Uni/5toCuatri/SistemasInteligentes/Practicas/P1/pr1_SSII/Proyecto/recursos/problems/large/calle_f_albacete_5000_4.json'
 RUTAJSON = '/home/calberto/Documents/Uni/5toCuatri/SistemasInteligentes/Practicas/P1/pr1_SSII/Proyecto/recursos/problems/huge/calle_agustina_aroca_albacete_5000_0.json'
 #RUTAJSON = '/home/calberto/Documents/Uni/5toCuatri/SistemasInteligentes/Practicas/P1/pr1_SSII/Proyecto/recursos/problems/test/test.json'
 #RUTAJSON = '/home/calberto/Documents/Uni/5toCuatri/SistemasInteligentes/Practicas/P1/pr1_SSII/Proyecto/recursos/problems/medium/calle_maria_marin_500_0.json'
@@ -27,6 +28,8 @@ class Estado:
             return False
         else:
             return self.identifier == otro.identifier
+    def __lt__(self, otro):
+        return self.identifier < otro.identifier
 
 #Segmento:    
 class Accion:
@@ -99,8 +102,11 @@ class Nodo:
         return f"Nodo(estado={self.estado}, padre={self.padre}, accion={self.accion}, coste={self.coste}, profundidad={self.profundidad})"
 
     def __eq__(self,otro):
+        if not isinstance(otro, Nodo):
+            return False
         return self.estado.__eq__(otro.estado) and self.accion.__eq__(otro.accion) and self.padre.__eq__(otro.padre)
-
+    def __lt__(self,otro):
+        return self.estado.__lt__(otro.estado)
     #METODOS:
 
     #Devuelve la siguiente calle de la interseccion
@@ -173,4 +179,8 @@ class Nodo:
         #Ha da distancias mayores que Hb.
         #print("Ha: ",Ha)
         #print("Hb: ",Hb)
-        return Ha
+        return Hb
+
+
+        
+
