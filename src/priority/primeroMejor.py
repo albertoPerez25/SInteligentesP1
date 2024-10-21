@@ -10,9 +10,8 @@ class BusquedaPM(Busqueda):
     
     def añadir(self, nodo, pq = None):
         if pq == None:
-            pq = self.frontera
-        
-        heapq.heappush(pq,(nodo.getDistanceToFinal(nodo) / nodo.getSpeedOf(nodo.accion),nodo))
+            pq = self.frontera      
+        heapq.heappush(pq,(self.heuristica(nodo),nodo))
         return pq
 
 print(f"\nBusqueda Primero Mejor:\n")

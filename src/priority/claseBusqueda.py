@@ -32,6 +32,9 @@ class Busqueda:
 
     def costeIndividual(self,origen,calle,destino):
         return origen.getDistanceOf(calle) / origen.getSpeedOf(calle)
+    
+    def heuristica(self, nodo):
+        return (nodo.getDistanceToFinal(nodo) / nodo.getSpeedOf(nodo.accion),nodo)
 
     def listaSolucion(self,nodo):
         sol = []
@@ -107,8 +110,8 @@ class Busqueda:
 # 7.!HECHO ClaseBusqueda -> Cambiar llamadas a metodos por las nuevas
 # 8.!HECHO Actualizar metodos de algoritmos para llamar a los nuevos metodos
 # 9.Segmento -> Diccionario
-# 10.Heuristica -> en ClaseBúsqueda
-# 11.Heuristica -> Mediante una PriorityQueue(Id,Nodo)
+# 10.!HECHO Heuristica -> en ClaseBúsqueda
+# 11.!HECHO Heuristica -> Mediante una PriorityQueue(Id,Nodo)
 
 #OTRAS NOTAS
 # Cerrados -> Identificador

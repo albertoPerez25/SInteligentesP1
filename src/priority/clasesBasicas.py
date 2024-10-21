@@ -68,7 +68,7 @@ class Problema:
             if (seg['speed'] > self.maxSpeed):
                 self.maxSpeed = seg['speed']
             self.segments.add(Accion(seg['origin'], seg['destination'], seg['distance'], seg['speed']))
-            self.segments.add(Accion(seg['destination'], seg['origin'], seg['distance'], seg['speed'])) #Por doble sentido en las calles. Muy ineficiente
+            #self.segments.add(Accion(seg['destination'], seg['origin'], seg['distance'], seg['speed'])) #Por doble sentido en las calles. Muy ineficiente
 
     #Agregar metodos de nodoAux que usen intersection_dic
     def getIntersection(self, id):
@@ -126,12 +126,12 @@ class Nodo:
             return self.estado.identifier
         return intersection.identifier
     
-    def getLatitude(self, intersection = None): #NOUSADO
+    def getLatitude(self, intersection = None): 
         if(intersection == None):
             return self.estado.latitude
         return intersection.latitude
     
-    def getLongitude(self, intersection = None): #NOUSADO
+    def getLongitude(self, intersection = None): 
         if(intersection == None):
             return self.estado.longitude
         return intersection.longitude
@@ -145,7 +145,8 @@ class Nodo:
             ret = problema.getSegmentsOf(id)
         #if(self.accion == None): #Por doble sentido en las calles
         #    return ret
-        #ret.append(problema.getSegmentsOf(self.accion.origin)) #BUG añade Lista en vez de elemento
+        #ret.append(Accion(self.accion.destination,self.accion.origin,self.accion.distance,self.accion.speed)) #BUG añade Lista en vez de elemento
+        #En vez de llamar a getSegment crear una Accion con dest y orig invertidos y el resto igual
         return ret
     
     def getSpeedOf(self, segment = None):
@@ -182,9 +183,9 @@ class Nodo:
             nodo = self
         #Dos heuristicas:
         #Restar long y lat iniciales menos finales
-        Ha = abs(nodo.estado.latitude - problema.nodoFinal.latitude) + abs(nodo.estado.longitude - problema.nodoFinal.longitude)
+        Ha = abs(nodo.getLatitude() - problema.nodoFinal.latitude) + abs(nodo.getLongitude() - problema.nodoFinal.longitude)
         #Pitágoras
-        Hb = sqrt((nodo.estado.latitude - problema.nodoFinal.latitude)**2 + (nodo.estado.longitude - problema.nodoFinal.longitude)**2)
+        Hb = sqrt((nodo.getLatitude() - problema.nodoFinal.latitude)**2 + (nodo.getLongitude() - problema.nodoFinal.longitude)**2)
         #Ha da distancias mayores que Hb.
         #print("Ha: ",Ha)
         #print("Hb: ",Hb)
