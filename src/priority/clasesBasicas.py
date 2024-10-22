@@ -9,10 +9,11 @@ Al_Large1 = '/home/calberto/Documents/Uni/5toCuatri/SistemasInteligentes/Practic
 Al_Huge1 = '/home/calberto/Documents/Uni/5toCuatri/SistemasInteligentes/Practicas/P1/pr1_SSII/Proyecto/recursos/problems/huge/calle_agustina_aroca_albacete_5000_0.json'
 Al_Test1 = '/home/calberto/Documents/Uni/5toCuatri/SistemasInteligentes/Practicas/P1/pr1_SSII/Proyecto/recursos/problems/test/test.json'
 Al_Medium1 = '/home/calberto/Documents/Uni/5toCuatri/SistemasInteligentes/Practicas/P1/pr1_SSII/Proyecto/recursos/problems/medium/calle_maria_marin_500_0.json'
+Al_Small1 = '/home/calberto/Documents/Uni/5toCuatri/SistemasInteligentes/Practicas/P1/pr1_SSII/Proyecto/recursos/problems/small/calle_del_virrey_morcillo_albacete_250_3.json'
 Ma_Medium1 = '/home/marcos/Documentos/3_Uni/Sistemas_Inteligentes/Programas_python/SInteligentesP1/recursos/problems/medium/calle_maria_marin_500_0.json'
 Ma_Test1 = '/home/marcos/Documentos/3_Uni/Sistemas_Inteligentes/Programas_python/SInteligentesP1/recursos/problems/test/test.json'
 
-RUTAJSON = Al_Test1
+RUTAJSON = Al_Small1
 
 
 #Interseccion:
@@ -30,6 +31,12 @@ class Estado:
             return self.identifier == otro.identifier
     def __lt__(self, otro):
         return self.identifier < otro.identifier
+    def __gt__(self,otro):
+        return self.identifier > otro.identifier
+    def __le__(self, otro):
+        return self.identifier <= otro.identifier
+    def __ge__(self, otro):
+        return self.identifier >= otro.identifier
 
 #Segmento:    
 class Accion:
@@ -99,13 +106,19 @@ class Nodo:
         
     def __str__(self):
         return f"Nodo(estado={self.estado}, padre={self.padre}, accion={self.accion}, coste={self.coste}, profundidad={self.profundidad})"
-
+    
     def __eq__(self,otro):
         if not isinstance(otro, Nodo):
             return False
         return self.estado.__eq__(otro.estado) and self.accion.__eq__(otro.accion) and self.padre.__eq__(otro.padre)
     def __lt__(self,otro):
         return self.estado.__lt__(otro.estado)
+    def __gt__(self,otro):
+        return self.estado.__gt__(otro.estado)
+    def __le__(self, otro):
+        return self.estado.__le__(otro.estado)
+    def __ge__(self, otro):
+        return self.estado.__ge__(otro.estado)
     #METODOS:
 
     #Devuelve la siguiente calle de la interseccion
